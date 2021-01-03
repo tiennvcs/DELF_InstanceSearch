@@ -1,0 +1,2 @@
+MAX_DESCRIPTOR = 100
+K = 10

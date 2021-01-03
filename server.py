@@ -7,12 +7,13 @@ from flask import Flask, request, render_template
 from pathlib import Path
 from delf import utils 
 from utils import load_data
+from config.config import MAX_DESCRIPTOR, K
 
 # Read image features
 print("[INFO] Loading database ...")
 config_path = 'config/delf_config.pbtxt'
 fe = FeatureExtractor(config_path)
-img_lst, features = load_data(path='./static/database')
+img_paths, features = load_data(path='./static/database')
 
 
 app = Flask(__name__)
@@ -30,18 +31,25 @@ def index():
 
         converted_jpg = np.array(utils.RgbLoader(uploaded_img_path))
 
+        print(features.shape)
         # Return the local descriptors of query image. with shape [1000, 40] by default
-        start_time = time.clock()
+        start_time = time.process_time()
         query_features = fe.extract(converted_jpg)
-        print("Time extract feature: ", time.clock()-start_time)
+        print("Time extract feature: ", time.process_time()-start_time)
 
         # Similarity evaluation
+        dists = []
+        print(features.shape)
+        different_distances = features - np.expand_dims(query_features[:MAX_DESCRIPTOR], 0)
+        for distance_descriptor in different_distances:
+            distance_descriptor = np.linalg.norm(distance_descriptor, axis=1)
+            dists.append(np.linalg.norm(distance_descriptor))
 
+        ids = np.argsort(dists)[:K]
+        scores = [(dists[id], img_paths[id]) for id in ids]
 
         # Ranking
 
-
-        scores = []
 
         return render_template('index.html',
                                query_path=uploaded_img_path,
