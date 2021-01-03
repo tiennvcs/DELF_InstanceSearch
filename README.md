@@ -1,5 +1,4 @@
-# instance_search
-# instance_search
+# Instance search in image using DEep Local Features 
 
 ## Dataset
 
