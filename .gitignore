@@ -131,4 +131,4 @@ dmypy.json
 # Custom ignore files, folders
 delf/examples/data/
 static/database/
-static/upload/
+static/uploaded/
