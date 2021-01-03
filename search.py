@@ -1,1 +1,0 @@
-print("Search image")
