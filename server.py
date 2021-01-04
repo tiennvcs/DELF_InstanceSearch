@@ -1,4 +1,6 @@
 import time
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import numpy as np
 from PIL import Image
 from feature_extractor import FeatureExtractor
@@ -31,10 +33,11 @@ def index():
 
         converted_jpg = np.array(utils.RgbLoader(uploaded_img_path))
 
-        print(features.shape)
         # Return the local descriptors of query image. with shape [1000, 40] by default
         start_time = time.process_time()
         query_features = fe.extract(converted_jpg)
+        print(query_features.keys())
+        input()
         print("Time extract feature: ", time.process_time()-start_time)
 
         # Similarity evaluation

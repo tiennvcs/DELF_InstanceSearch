@@ -64,11 +64,10 @@ def main(unused_argv):
       descriptors_2, distance_upper_bound=_DISTANCE_THRESHOLD)
 
   # Select feature locations for putative matches.
-  locations_2_to_use = np.array([
-      locations_2[i,]
-      for i in range(num_features_2)
-      if indices[i] != num_features_1
-  ])
+  locations_2_to_use = np.array([locations_2[i,] for i in range(num_features_2) if indices[i] != num_features_1])
+  print(locations_2_to_use)
+  print(locations_2_to_use.shape)
+  input()
   locations_1_to_use = np.array([
       locations_1[indices[i],]
       for i in range(num_features_2)
