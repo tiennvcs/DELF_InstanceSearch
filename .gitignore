@@ -132,3 +132,6 @@ dmypy.json
 delf/examples/data/
 static/database/
 static/uploaded/
+static.zip
+static_backup/
+static/query_output/

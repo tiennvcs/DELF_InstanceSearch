@@ -41,6 +41,7 @@ def main(args):
     
     for type_img in types:
         img_paths.extend(sorted(glob2.glob(os.path.join(base_image_path, type_img))))
+    
     for i, feature_path in enumerate(sorted(glob2.glob(os.path.join(base_feature_path, '*.delf')))):
         _, _, descriptors, _, _ = feature_io.ReadFromFile(feature_path)
         features.extend(descriptors)
@@ -49,7 +50,6 @@ def main(args):
     features = np.array(features, dtype=np.float32)
     print(features.shape)
     pq = product_quantization(vectors=features, M=10, k=60, output_path='./static/PQ/')
-
 
 
 if __name__ == "__main__":

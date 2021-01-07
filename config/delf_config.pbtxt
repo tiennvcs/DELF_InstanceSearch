@@ -19,7 +19,7 @@ delf_local_config {
   pca_parameters {
     mean_path: "delf/examples/parameters/delf_gld_20190411/pca/mean.datum"
     projection_matrix_path: "delf/examples/parameters/delf_gld_20190411/pca/pca_proj_mat.datum"
-    pca_dim: 10
+    pca_dim: 40
     use_whitening: false
   }
 }

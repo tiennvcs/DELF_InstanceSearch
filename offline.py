@@ -14,11 +14,11 @@ _DELF_EXT = '.delf'
 if __name__ == '__main__':
 
     config_path = 'config/delf_config.pbtxt'
-    output_path = './static/database/features/'
+    output_path = './static/database/features/all_features'
 
     fe = FeatureExtractor(config_path)
 
-    for img_path in sorted(Path("./static/database/images").glob("*.jpg")):
+    for img_path in sorted(Path("./static/database/images/all_images").glob("*.jpg")):
 
         out_desc_fullpath = os.path.join(output_path, os.path.split(img_path)[-1].split(".")[0]+_DELF_EXT)
         if os.path.exists(out_desc_fullpath):
