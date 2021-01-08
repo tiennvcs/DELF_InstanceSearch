@@ -2,7 +2,7 @@ import os
 import time
 import faiss
 import pickle
-import nanopq
+#import nanopq
 import argparse
 from scipy import spatial
 import numpy as np

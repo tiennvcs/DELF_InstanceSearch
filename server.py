@@ -1,7 +1,6 @@
 import time
 import os
 import pickle
-import nanopq
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import numpy as np
 from PIL import Image
@@ -12,7 +11,8 @@ from pathlib import Path
 from delf import utils 
 from utils import load_data, make_index_table
 from config.config import K, pq_config
-#from sklearn.externals import joblib
+#import sklearn.external.joblib as extjoblib
+import h5py
 from retrieval import search
 import faiss
 
@@ -48,7 +48,7 @@ print("** Index table time: {} (s)".format(time.process_time()-index_table_time)
 
 # Build Product Quantization
 build_pq_time = time.process_time()
-pq_path = 'static/PQ/pq_40_60.pkl'
+pq_path = 'static/PQ/pq_40_60.bin'
 if not os.path.exists(pq_path):
     #pq = nanopq.PQ(M=pq_config['n_subq'], Ks=pq_config['n_centroids'], verbose=True)
     #pq.fit(vecs=db_descriptors_np, iter=200, seed=18521489)
@@ -57,16 +57,14 @@ if not os.path.exists(pq_path):
     n_centroids = 64  # number of centroids for each sub-vector
     n_bits = 8        # number of bits for each sub-vector
     n_probe = 4       # number of voronoi cell to explore
-    coarse_quantizer = faiss.IndexFlatL2(dim)
-    pq = faiss.IndexIVFPQ(coarse_quantizer, dim, n_centroids, n_subq, n_bits) 
-    pq.nprobe = n_probe
+    coarse_quantizer = faiss.IndexFlatL2(pq_config['dim'])
+    pq = faiss.IndexIVFPQ(coarse_quantizer, pq_config['dim'],
+                        pq_config['n_centroids'], pq_config['n_subq'], pq_config['n_bits']) 
+    pq.nprobe = pq_config['n_probe']
     pq.train(db_descriptors_np)
     pq.add(db_descriptors_np)
-    # with open(pq_path, 'wb') as f:
-    #     joblib.dump(pq, f)
-    #   
-# with open(pq_path, 'rb') as f:
-#     pq = joblib.load(f)
+    faiss.write_index(pq, pq_path)
+pq = faiss.read_index(pq_path)  # index2 is identical to index
 print("** Build PQ table time: {} (s)".format(time.process_time()-build_pq_time))
 # End build
 

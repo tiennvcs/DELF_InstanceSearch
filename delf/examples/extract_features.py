@@ -71,11 +71,9 @@ def main(unused_argv):
 
   # Parse DelfConfig proto.
   config = delf_config_pb2.DelfConfig()
-
   with tf.io.gfile.GFile(cmd_args.config_path, 'r') as f:
     text_format.Merge(f.read(), config)
-  print(config)
-  input()
+
   # Create output directory if necessary.
   if not tf.io.gfile.exists(cmd_args.output_dir):
     tf.io.gfile.makedirs(cmd_args.output_dir)

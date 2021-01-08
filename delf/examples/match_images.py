@@ -65,10 +65,10 @@ def main(unused_argv):
 
   # Select feature locations for putative matches.
   locations_2_to_use = np.array([
-      locations_2[i,] 
-      for i in range(num_features_2) 
-      if indices[i] != num_features_1])
-  
+      locations_2[i,]
+      for i in range(num_features_2)
+      if indices[i] != num_features_1
+  ])
   locations_1_to_use = np.array([
       locations_1[indices[i],]
       for i in range(num_features_2)

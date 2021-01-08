@@ -1,2 +1,0 @@
-../../static/img/nhatho1.jpg
-../../static/img/nhatho2.jpg
