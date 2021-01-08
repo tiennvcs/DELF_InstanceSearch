@@ -22,10 +22,6 @@ class FeatureExtractor():
     def extract(self, img):
         
         extracted_features = self.extractor_fn(img)
-        # locations_out = extracted_features['local_features']['locations']
-        # descriptors_out = extracted_features['local_features']['descriptors'] ## --> [1000, 40]
-        # feature_scales_out = extracted_features['local_features']['scales']
-        # attention_out = extracted_features['local_features']['attention']
         return extracted_features['local_features']
 
 

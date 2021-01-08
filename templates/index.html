@@ -15,8 +15,8 @@
             <h2 style="color: green;">Results</h2>
             {% for score in scores %}
             <figure style="float: left; margin-right: 20px; margin-bottom: 20px;">
-                <img style="align-content: center;" src="{{ score[1] }}" height="200px">
-                <figcaption>{{ score[0] }}</figcaption>
+                <img style="align-content: center;" src="{{ score[2] }}" height="200px">
+                <figcaption style="align-content: center;">{{ score[0] }}</figcaption>
             </figure>
             {% endfor %}
         </div>

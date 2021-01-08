@@ -1,7 +1,7 @@
 import faiss
 
 
-MAX_DESCRIPTOR = 500
+#MAX_DESCRIPTOR = 1000
 K = 10
 
 
