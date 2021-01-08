@@ -32,11 +32,15 @@ descriptors_list = []
 for db_feature_img in db_features:
     locations, _, descriptors, _, _ = db_feature_img
     if len(descriptors.shape) == 1:
-        continue
+        descriptors = np.array([np.array([1e6]*40)])
+        locations = np.array([np.array((-1, -1))])
+    
     locations_list.append(locations)
     descriptors_list.append(descriptors)
 
 db_descriptors_np = np.concatenate(np.asarray(descriptors_list), axis=0).astype('float32')
+print(np.max(db_descriptors_np).flatten())
+input()
 print("** Stack time: {} (s)".format(time.process_time()-stack_time))
 # End stack
 
@@ -48,15 +52,8 @@ print("** Index table time: {} (s)".format(time.process_time()-index_table_time)
 
 # Build Product Quantization
 build_pq_time = time.process_time()
-pq_path = 'static/PQ/pq_40_60.bin'
+pq_path = 'static/PQ/pq_all_images_40D_{}.bin'.format(len(db_features))
 if not os.path.exists(pq_path):
-    #pq = nanopq.PQ(M=pq_config['n_subq'], Ks=pq_config['n_centroids'], verbose=True)
-    #pq.fit(vecs=db_descriptors_np, iter=200, seed=18521489)
-    dim = 40          # dimension
-    n_subq = 8        # number of sub-quantizers
-    n_centroids = 64  # number of centroids for each sub-vector
-    n_bits = 8        # number of bits for each sub-vector
-    n_probe = 4       # number of voronoi cell to explore
     coarse_quantizer = faiss.IndexFlatL2(pq_config['dim'])
     pq = faiss.IndexIVFPQ(coarse_quantizer, pq_config['dim'],
                         pq_config['n_centroids'], pq_config['n_subq'], pq_config['n_bits']) 

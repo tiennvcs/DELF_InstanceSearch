@@ -31,15 +31,6 @@ def load_data(path):
 
 
 def RgbLoader(path):
-  """Helper function to read image with PIL.
-
-  Args:
-    path: Path to image to be loaded.
-
-  Returns:
-    PIL image in RGB format.
-  """
-  #with tf.io.gfile.GFile(path, 'rb') as f:
   with open(path, 'rb') as f:
     img = Image.open(f)
     return img.convert('RGB')
@@ -55,7 +46,17 @@ def make_index_table(descriptors_list):
         for i_des in i_des_range:
             img_from_des[i_des] = i_img
 
-        # print(i_img, list(i_des_range))
         cnt+=len(des_list)
 
     return des_from_img, img_from_des
+
+
+def load_features_from_dir(path):
+
+    features = []
+    base_feature_path = path
+    for feature_path in sorted(glob2.glob(os.path.join(base_feature_path, '*.delf')))[:]:
+        extracted_features = feature_io.ReadFromFile(feature_path)
+        features.append(extracted_features)
+    #assert len(img_paths) == len(features), "The number of features is not campatible with the number of image database."
+    return np.array(features, dtype='object')
