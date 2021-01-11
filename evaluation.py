@@ -22,7 +22,7 @@ def calculate_AP(res_query_lst, true_lst):
             AP += count/(j+1)
     if count == 0:
         return 0
-    return AP
+    return AP / count
 
 
 # perform query for all image and calculate mAP
@@ -30,7 +30,8 @@ def calculate_mAP(gt_path, base_dir, db_features,
                     db_descriptors_np, db_img_from_des,
                     delf_model, pq, k, ransac, query_output):
     
-    img_paths = glob2.glob(os.path.join(base_dir, '*.jpg'))[:]
+    AP = []
+    img_paths = sorted(glob2.glob(os.path.join(base_dir, '*.jpg')))[:]
     gt_paths = os.listdir(gt_path)
     gt_paths = [os.path.join(gt_path, file_name) for file_name in gt_paths]
     query_lst, ok_lst, good_lst, junk_lst = [], [], [], []
@@ -41,41 +42,49 @@ def calculate_mAP(gt_path, base_dir, db_features,
             good_lst.append(file_path[:-9] + 'good.txt')
             junk_lst.append(file_path[:-9] + 'junk.txt')
 
+    time_processes = 0
     for i, query in enumerate(query_lst):
         with open(query, "r") as f_query:
             query_img_name = f_query.read().split()[0].split("_")[1:]
             query_img_name = '_'.join(query_img_name)
             query_img_path = os.path.join(base_dir, query_img_name) + '.jpg'
-            f_query.close()
 
-        with open(ok_lst[i], "r") as f_true:
+        if not os.path.exists(query_img_path):
+            print("Skip query {}".format(query_img_path))
+            continue
+        with open(good_lst[i], "r") as f_true:
             true_lst = f_true.read().splitlines()
-            f_query.close()
         
+        print(query_img_path)
         query_img = np.array(RgbLoader(query_img_path))
        
+        time_step = time.process_time()
         results = search(img_paths=img_paths, db_features=db_features, 
             db_descriptors_np=db_descriptors_np, db_img_from_des=db_img_from_des,
             delf_model=delf_model, pq=pq,
             query_img=query_img, k=10, ransac=1, 
             query_output='./static/query_output'
         )
-        
+        time_processes += (time.process_time()-time_step)
+
         results_query_lst = [os.path.basename(res[2]).split(".")[0] for res in results]
-        print(results_query_lst)
-        input()
+        print("--> Groundtruth file: ", query)
         # calculate mAP
         AP.append(calculate_AP(results_query_lst, true_lst))
+        print(AP)
+
+    print("---> Average time search: ", time_processes/len(query_lst))
     return sum(AP)/len(AP)  # mAP
 
 
 def main(args):
-    
     # Read image features
     config_path = 'config/delf_config.pbtxt'
     delf_model = FeatureExtractor(config_path)
-    print("[INFO] Loading features ...")
+    print("[INFO] Loading database ...")
+    start_load_time = time.process_time()
     db_features = load_features_from_dir(path=args['feature_paths'])
+    print("** Loading time: {} (s)".format(time.process_time()-start_load_time))
 
     # Stack descriptors of images
     stack_time = time.process_time()
@@ -86,8 +95,10 @@ def main(args):
         if len(descriptors.shape) == 1:
             descriptors = np.array([np.array([1e6]*40)])
             locations = np.array([np.array((-1, -1))])
+        
         locations_list.append(locations)
         descriptors_list.append(descriptors)
+
     db_descriptors_np = np.concatenate(np.asarray(descriptors_list), axis=0).astype('float32')
     print("** Stack time: {} (s)".format(time.process_time()-stack_time))
     # End stack
@@ -100,15 +111,21 @@ def main(args):
 
     # Build Product Quantization
     build_pq_time = time.process_time()
-    pq = faiss.read_index(args['pq_path'])
+    #pq_path = 'static/PQ/pq_of_40D_{}.bin'.format(len(db_features))
+
+    pq = faiss.read_index(args['pq_path'])  # index2 is identical to index
     print("** Build PQ table time: {} (s)".format(time.process_time()-build_pq_time))
     
-    calculate_mAP(gt_path=args['gt_path'], base_dir=args['base_dir'], db_features=db_features, 
+
+    mAP = calculate_mAP(gt_path=args['gt_path'], base_dir=args['base_dir'], db_features=db_features, 
                     db_descriptors_np=db_descriptors_np, db_img_from_des=db_img_from_des,
                     delf_model=delf_model, pq=pq, k=10, ransac=1, 
                     query_output='./static/query_output',
     )
-
+    
+    print("mAP at good groundtruth: ", mAP)
+    with open('result_oxford.txt', 'a+') as f:
+        f.write("oxford good 40 " + str(mAP))
 
 
 if __name__ == '__main__':
@@ -123,3 +140,5 @@ if __name__ == '__main__':
                             help='The path to pq object file')
     args = vars(parser.parse_args())
     main(args)
+
+    

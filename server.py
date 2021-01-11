@@ -39,8 +39,6 @@ for db_feature_img in db_features:
     descriptors_list.append(descriptors)
 
 db_descriptors_np = np.concatenate(np.asarray(descriptors_list), axis=0).astype('float32')
-print(np.max(db_descriptors_np).flatten())
-input()
 print("** Stack time: {} (s)".format(time.process_time()-stack_time))
 # End stack
 
@@ -60,6 +58,7 @@ if not os.path.exists(pq_path):
     pq.nprobe = pq_config['n_probe']
     pq.train(db_descriptors_np)
     pq.add(db_descriptors_np)
+    print("Ahihi")
     faiss.write_index(pq, pq_path)
 pq = faiss.read_index(pq_path)  # index2 is identical to index
 print("** Build PQ table time: {} (s)".format(time.process_time()-build_pq_time))

@@ -53,7 +53,7 @@ def reranking(img_paths, features, query_img, query_feature):
                                     transform.AffineTransform,
                                     min_samples=3,
                                     residual_threshold=20,
-                                    max_trials=1000)
+                                    max_trials=500)
         #print(f'Found {sum(inliers)} inliers')
 
         scores.append((sum(inliers), Model, img_paths[i]))
