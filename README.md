@@ -1,4 +1,4 @@
-# Instance search in image using DEep Local Features 
+# Instance search in image using DEep Local Features (DELF) 
 
 ## Dataset
 
